@@ -1,3 +1,8 @@
+from collections import defaultdict
+
+import numpy as np
+import pandas as pd
+
 map_expressions = {
     "KAT1MoralisierendesSegment": "KAT1-Moralisierendes Segment",
     "Moralwerte": "KAT2-Moralwerte",
@@ -15,7 +20,7 @@ map_expressions = {
 def validate_data_dict(data_dict):
     if not data_dict:
         raise ValueError("data_dict is empty")
-    for data_file_name, data_file in data_dict.items():
+    for data_file in data_dict.items():
         validation_list = ["data", "file_type", "sofa", "paragraph"]
         missing_cats = []
         for category in validation_list:
@@ -132,7 +137,7 @@ class AnalyseOccurrence:
             span_dict = self.data_dict[file_name]["data"]
             span_text = self.data_dict[file_name]["sofa"]
             for main_cat_key, main_cat_value in span_dict.items():
-                for sub_cat_key in main_cat_value.keys():
+                for sub_cat_key in main_cat_value:
                     # save the span begin and end character index for further analysis
                     # span_dict[main_cat_key][sub_cat_key] =
                     # find the text for each span
@@ -158,7 +163,7 @@ class AnalyseOccurrence:
         for file_name in self.file_names:
             span_dict = self.data_dict[file_name]["data"]
             for main_cat_key, main_cat_value in span_dict.items():
-                for sub_cat_key in main_cat_value.keys():
+                for sub_cat_key in main_cat_value:
                     # report the beginning and end of each span as a tuple
                     span_list = [(span["begin"], span["end"]) for span in span_dict[main_cat_key][sub_cat_key]]
                     self.df.at[
