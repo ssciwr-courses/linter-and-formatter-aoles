@@ -30,4 +30,4 @@ def find_files(path: str = None, pattern: str = "*.png", limit: int = 20) -> lis
 
 if __name__ == "__main__":
     list = find_files(path="./data/")
-    print("Found files {}".format(list))
+    print(f"Found files {list}")

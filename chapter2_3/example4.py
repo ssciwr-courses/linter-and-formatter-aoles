@@ -69,7 +69,7 @@ class AnalyseOccurrence:
     def _initialize_df(self):
         """Helper method to initialize data frame."""
         self.df = pd.DataFrame(self.instance_dict)
-        self.df.index = self.df.index.set_names((["Main Category", "Sub Category"]))
+        self.df.index = self.df.index.set_names(["Main Category", "Sub Category"])
 
     def _get_categories(self, span_dict, file_name):
         """Helper method to initialize a dict with the given main and sub categories."""
