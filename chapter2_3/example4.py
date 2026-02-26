@@ -1,4 +1,3 @@
-
 map_expressions = {
     "KAT1MoralisierendesSegment": "KAT1-Moralisierendes Segment",
     "Moralwerte": "KAT2-Moralwerte",
@@ -11,6 +10,7 @@ map_expressions = {
     "KAT5Ausformulierung": "KAT5-Forderung implizit",
     "Kommentar": "KOMMENTAR",
 }
+
 
 def validate_data_dict(data_dict):
     if not data_dict:
@@ -76,9 +76,7 @@ class AnalyseOccurrence:
         for main_cat_key, main_cat_value in span_dict.items():
             for sub_cat_key, sub_cat_value in main_cat_value.items():
                 # the tuple index makes it easy to convert the dict into a pandas dataframe
-                self.instance_dict[file_name][(main_cat_key, sub_cat_key)] = len(
-                    sub_cat_value
-                )
+                self.instance_dict[file_name][(main_cat_key, sub_cat_key)] = len(sub_cat_value)
         return self.instance_dict
 
     def _add_total(self):
@@ -127,9 +125,7 @@ class AnalyseOccurrence:
     def report_spans(self):
         """Reports spans of a category per text source."""
         # span reports the spans of the annotations separated by separator-token
-        self.instance_dict = self._get_categories(
-            self.data_dict[self.file_names[0]]["data"], self.file_names[0]
-        )
+        self.instance_dict = self._get_categories(self.data_dict[self.file_names[0]]["data"], self.file_names[0])
         self._initialize_df()
         self.df[:] = self.df[:].astype("object")
         for file_name in self.file_names:
@@ -141,13 +137,10 @@ class AnalyseOccurrence:
                     # span_dict[main_cat_key][sub_cat_key] =
                     # find the text for each span
                     span_annotated_text = [
-                        span_text[span["begin"] : span["end"]]
-                        for span in span_dict[main_cat_key][sub_cat_key]
+                        span_text[span["begin"] : span["end"]] for span in span_dict[main_cat_key][sub_cat_key]
                     ]
                     # clean the spans from #
-                    span_annotated_text = [
-                        span.replace("#", "") for span in span_annotated_text
-                    ]
+                    span_annotated_text = [span.replace("#", "") for span in span_annotated_text]
                     # clean the spans from "
                     # span_annotated_text = [
                     #     span.replace('"', "") for span in span_annotated_text
@@ -167,10 +160,7 @@ class AnalyseOccurrence:
             for main_cat_key, main_cat_value in span_dict.items():
                 for sub_cat_key in main_cat_value.keys():
                     # report the beginning and end of each span as a tuple
-                    span_list = [
-                        (span["begin"], span["end"])
-                        for span in span_dict[main_cat_key][sub_cat_key]
-                    ]
+                    span_list = [(span["begin"], span["end"]) for span in span_dict[main_cat_key][sub_cat_key]]
                     self.df.at[
                         (main_cat_key, sub_cat_key),
                         file_name,
@@ -179,6 +169,3 @@ class AnalyseOccurrence:
     def map_categories(self):
         self.df = self.df.rename(map_expressions)
         self._clean_df()
-
-
-
