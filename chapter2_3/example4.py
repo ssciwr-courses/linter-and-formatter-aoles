@@ -1,3 +1,7 @@
+from collections import defaultdict
+
+import numpy as np
+import pandas as pd
 
 map_expressions = {
     "KAT1MoralisierendesSegment": "KAT1-Moralisierendes Segment",
@@ -12,10 +16,11 @@ map_expressions = {
     "Kommentar": "KOMMENTAR",
 }
 
+
 def validate_data_dict(data_dict):
     if not data_dict:
         raise ValueError("data_dict is empty")
-    for data_file_name, data_file in data_dict.items():
+    for data_file in data_dict.items():
         validation_list = ["data", "file_type", "sofa", "paragraph"]
         missing_cats = []
         for category in validation_list:
@@ -69,16 +74,14 @@ class AnalyseOccurrence:
     def _initialize_df(self):
         """Helper method to initialize data frame."""
         self.df = pd.DataFrame(self.instance_dict)
-        self.df.index = self.df.index.set_names((["Main Category", "Sub Category"]))
+        self.df.index = self.df.index.set_names(["Main Category", "Sub Category"])
 
     def _get_categories(self, span_dict, file_name):
         """Helper method to initialize a dict with the given main and sub categories."""
         for main_cat_key, main_cat_value in span_dict.items():
             for sub_cat_key, sub_cat_value in main_cat_value.items():
                 # the tuple index makes it easy to convert the dict into a pandas dataframe
-                self.instance_dict[file_name][(main_cat_key, sub_cat_key)] = len(
-                    sub_cat_value
-                )
+                self.instance_dict[file_name][(main_cat_key, sub_cat_key)] = len(sub_cat_value)
         return self.instance_dict
 
     def _add_total(self):
@@ -127,27 +130,22 @@ class AnalyseOccurrence:
     def report_spans(self):
         """Reports spans of a category per text source."""
         # span reports the spans of the annotations separated by separator-token
-        self.instance_dict = self._get_categories(
-            self.data_dict[self.file_names[0]]["data"], self.file_names[0]
-        )
+        self.instance_dict = self._get_categories(self.data_dict[self.file_names[0]]["data"], self.file_names[0])
         self._initialize_df()
         self.df[:] = self.df[:].astype("object")
         for file_name in self.file_names:
             span_dict = self.data_dict[file_name]["data"]
             span_text = self.data_dict[file_name]["sofa"]
             for main_cat_key, main_cat_value in span_dict.items():
-                for sub_cat_key in main_cat_value.keys():
+                for sub_cat_key in main_cat_value:
                     # save the span begin and end character index for further analysis
                     # span_dict[main_cat_key][sub_cat_key] =
                     # find the text for each span
                     span_annotated_text = [
-                        span_text[span["begin"] : span["end"]]
-                        for span in span_dict[main_cat_key][sub_cat_key]
+                        span_text[span["begin"] : span["end"]] for span in span_dict[main_cat_key][sub_cat_key]
                     ]
                     # clean the spans from #
-                    span_annotated_text = [
-                        span.replace("#", "") for span in span_annotated_text
-                    ]
+                    span_annotated_text = [span.replace("#", "") for span in span_annotated_text]
                     # clean the spans from "
                     # span_annotated_text = [
                     #     span.replace('"', "") for span in span_annotated_text
@@ -165,12 +163,9 @@ class AnalyseOccurrence:
         for file_name in self.file_names:
             span_dict = self.data_dict[file_name]["data"]
             for main_cat_key, main_cat_value in span_dict.items():
-                for sub_cat_key in main_cat_value.keys():
+                for sub_cat_key in main_cat_value:
                     # report the beginning and end of each span as a tuple
-                    span_list = [
-                        (span["begin"], span["end"])
-                        for span in span_dict[main_cat_key][sub_cat_key]
-                    ]
+                    span_list = [(span["begin"], span["end"]) for span in span_dict[main_cat_key][sub_cat_key]]
                     self.df.at[
                         (main_cat_key, sub_cat_key),
                         file_name,
@@ -179,6 +174,3 @@ class AnalyseOccurrence:
     def map_categories(self):
         self.df = self.df.rename(map_expressions)
         self._clean_df()
-
-
-
